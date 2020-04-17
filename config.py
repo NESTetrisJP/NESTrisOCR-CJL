@@ -9,14 +9,17 @@ class Config:
     self.showStencil = False
     self.xCoord = 0
     self.yCoord = 0
-    self.width = 400
-    self.height = 400
+    self.width = 512
+    self.height = 448
     self.enableSettingsExpert = False
     self.captureFPS = 60
     self.sendFPS = 5
     self.windowHandle = 0
     self.blackThreshold = 25
     self.inGameThreshold = 30000
+    self.address = "localhost:5041"
+    self.playerName = ""
+    self.accessKey = ""
 
   def load(self):
     try:
@@ -39,6 +42,9 @@ class Config:
         if isValid("windowHandle", int): self.windowHandle = hash["windowHandle"]
         if isValid("blackThreshold", int): self.blackThreshold = hash["blackThreshold"]
         if isValid("inGameThreshold", int): self.inGameThreshold = hash["inGameThreshold"]
+        if isValid("address", str): self.address = hash["address"]
+        if isValid("playerName", str): self.playerName = hash["playerName"]
+        if isValid("accessKey", str): self.accessKey = hash["accessKey"]
     except:
       pass
 
@@ -60,7 +66,10 @@ class Config:
           "sendFPS": self.sendFPS,
           "windowHandle": self.windowHandle,
           "blackThreshold": self.blackThreshold,
-          "inGameThreshold": self.inGameThreshold
+          "inGameThreshold": self.inGameThreshold,
+          "address": self.address,
+          "playerName": self.playerName,
+          "accessKey": self.accessKey
         }))
     except:
       pass

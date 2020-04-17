@@ -89,7 +89,7 @@
      <item row="3" column="0" colspan="2">
       <widget class="QPushButton" name="connectButton">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
@@ -111,21 +111,21 @@
      <item row="1" column="1">
       <widget class="QLineEdit" name="playerName">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
       </widget>
      </item>
      <item row="2" column="1">
       <widget class="QLineEdit" name="accessKey">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
       </widget>
      </item>
      <item row="2" column="0">
       <widget class="QLabel" name="label_6">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="text">
         <string>キー:</string>
@@ -135,7 +135,7 @@
      <item row="1" column="0">
       <widget class="QLabel" name="label_5">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="text">
         <string>プレイヤー名:</string>
@@ -145,14 +145,14 @@
      <item row="0" column="1">
       <widget class="QLineEdit" name="address">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
       </widget>
      </item>
      <item row="0" column="0">
       <widget class="QLabel" name="label_10">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="text">
         <string>接続先:</string>
@@ -260,7 +260,7 @@
       <x>580</x>
       <y>520</y>
       <width>291</width>
-      <height>121</height>
+      <height>126</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_4" rowstretch="0,0,0,0,0">
@@ -410,6 +410,19 @@
       </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QLabel" name="networkStatus">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>620</y>
+      <width>211</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>未接続</string>
+    </property>
    </widget>
   </widget>
  </widget>

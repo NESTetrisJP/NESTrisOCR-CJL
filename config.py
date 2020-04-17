@@ -3,7 +3,7 @@ import json
 class Config:
   def __init__(self):
     self.preview = True
-    self.enableSettings = False
+    # self.enableSettings = False
     self.captureWindowName = "ウィンドウ プロジェクタ"
     self.showGrid = False
     self.showStencil = False
@@ -28,7 +28,7 @@ class Config:
         def isValid(key, typ):
           return key in hash and type(hash[key]) == typ
         if isValid("preview", bool): self.preview = hash["preview"]
-        if isValid("enableSettings", bool): self.enableSettings = hash["enableSettings"]
+        # if isValid("enableSettings", bool): self.enableSettings = hash["enableSettings"]
         if isValid("captureWindowName", str): self.captureWindowName = hash["captureWindowName"]
         if isValid("showGrid", bool): self.showGrid = hash["showGrid"]
         if isValid("showStencil", bool): self.showStencil = hash["showStencil"]
@@ -53,7 +53,7 @@ class Config:
       with open("config.json", mode="w") as f:
         f.write(json.dumps({
           "preview": self.preview,
-          "enableSettings": self.enableSettings,
+          # "enableSettings": self.enableSettings,
           "captureWindowName": self.captureWindowName,
           "showGrid": self.showGrid,
           "showStencil": self.showStencil,

@@ -64,7 +64,7 @@ class CaptureWorker(QThread):
             level = self.levelReader.read(image)
             next_ = self.nextReader.read(image)
             stats = self.statsReader.read(image)
-            self.done.emit({ "success": True, "inGame": True, "field": field, "score": score, "lines": lines, "level": level, "next": next_, "stats": stats, "image": image, "fps": self.showFPS })
+            self.done.emit({ "success": True, "inGame": True, "time": time.time_ns() // 1000000, "field": field, "score": score, "lines": lines, "level": level, "next": next_, "stats": stats, "image": image, "fps": self.showFPS })
           else:
             self.done.emit({ "success": True, "inGame": False, "image": image, "fps": self.showFPS })
         except:

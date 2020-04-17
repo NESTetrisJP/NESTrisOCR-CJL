@@ -19,7 +19,42 @@ class MainWindow(QMainWindow):
     self.setFixedSize(880, 650)
     self.ui = Ui_MainWindow()
     self.ui.setupUi(self)
-    self.setWindowTitle("NESTrisOCR for CTWC Japan Lite v0.1.0")
+    self.setWindowTitle("NESTrisOCR for CTWC Japan Lite v0.9.0")
+
+    self.settingsWidgets = [
+      self.ui.captureWindowName,
+      self.ui.captureWindowNameLabel,
+      self.ui.showGrid,
+      self.ui.showStencil,
+      self.ui.xCoord,
+      self.ui.xCoordLabel,
+      self.ui.yCoord,
+      self.ui.yCoordLabel,
+      self.ui.width,
+      self.ui.widthLabel,
+      self.ui.height,
+      self.ui.heightLabel,
+      self.ui.enableSettingsExpert
+    ]
+
+    self.settingsWidgetsExpert = [
+      self.ui.captureFPS,
+      self.ui.captureFPSLabel,
+      self.ui.sendFPS,
+      self.ui.sendFPSLabel,
+      self.ui.windowHandle,
+      self.ui.windowHandleLabel,
+      self.ui.blackThreshold,
+      self.ui.blackThresholdLabel,
+      self.ui.inGameThreshold,
+      self.ui.inGameThresholdLabel
+    ]
+
+    self.networkWidgets = [
+      self.ui.address,
+      self.ui.playerName,
+      self.ui.accessKey
+    ]
 
     self.currentHandle = 0
     self.captureWorker = None
@@ -42,7 +77,7 @@ class MainWindow(QMainWindow):
     self.config = Config()
     self.config.load()
     self.ui.preview.setChecked(self.config.preview)
-    self.ui.enableSettings.setChecked(self.config.enableSettings)
+    # self.ui.enableSettings.setChecked(self.config.enableSettings)
     self.ui.captureWindowName.setText(self.config.captureWindowName)
     self.ui.showGrid.setChecked(self.config.showGrid)
     self.ui.showStencil.setChecked(self.config.showStencil)
@@ -102,43 +137,15 @@ class MainWindow(QMainWindow):
     if self.ui.enableSettingsExpert.checkState() == Qt.Checked:
       enableExpert = True
 
-    widgets = [
-      self.ui.captureWindowName,
-      self.ui.captureWindowNameLabel,
-      self.ui.showGrid,
-      self.ui.showStencil,
-      self.ui.xCoord,
-      self.ui.xCoordLabel,
-      self.ui.yCoord,
-      self.ui.yCoordLabel,
-      self.ui.width,
-      self.ui.widthLabel,
-      self.ui.height,
-      self.ui.heightLabel,
-      self.ui.enableSettingsExpert
-    ]
-
-    widgetsExpert = [
-      self.ui.captureFPS,
-      self.ui.captureFPSLabel,
-      self.ui.sendFPS,
-      self.ui.sendFPSLabel,
-      self.ui.windowHandle,
-      self.ui.windowHandleLabel,
-      self.ui.blackThreshold,
-      self.ui.blackThresholdLabel,
-      self.ui.inGameThreshold,
-      self.ui.inGameThresholdLabel
-    ]
-
-    for w in widgets:
+    for w in self.settingsWidgets:
       w.setEnabled(enable)
-    for w in widgetsExpert:
+    for w in self.settingsWidgetsExpert:
       w.setEnabled(enable and enableExpert)
 
-    self.config.enableSettings = enable
+    # self.config.enableSettings = enable
     self.config.enableSettingsExpert = enableExpert
     self.updateCaptureWorkerRunning()
+    self.updateConnectButtonStatus()
 
   def updatePreview(self, enable):
     self.config.preview = enable
@@ -185,10 +192,13 @@ class MainWindow(QMainWindow):
     self.config.address = self.ui.address.text().strip()
     self.config.playerName = self.ui.playerName.text().strip()
     self.config.accessKey = self.ui.accessKey.text().strip()
+    self.updateConnectButtonStatus()
 
-    # Validate address
+  def updateConnectButtonStatus(self):
     self.ui.connectButton.setEnabled(True)
     self.ui.networkStatus.setText("未接続")
+    if self.ui.enableSettings.isChecked():
+      self.ui.connectButton.setEnabled(False)
     if self.config.accessKey == "":
       self.ui.connectButton.setEnabled(False)
       self.ui.networkStatus.setText("アクセスキーが空です")
@@ -203,15 +213,21 @@ class MainWindow(QMainWindow):
   def connectOrDisconnect(self):
     if self.networkWorker:
       self.ui.connectButton.setEnabled(False)
-      self.endConnection()
+      self.stopCaptureWorker()
+      self.endConnection(False)
     else:
       self.ui.connectButton.setEnabled(False)
       self.ui.connectButton.setText("切断")
+      self.ui.enableSettings.setEnabled(False)
+      for w in self.networkWidgets:
+        w.setEnabled(False)
+      self.startCaptureWorker()
       self.startConnection()
+      self.captureWorker.done.connect(self.networkWorker.accumulate)
       QTimer.singleShot(1000, lambda: self.ui.connectButton.setEnabled(True))
 
   def startConnection(self):
-    self.networkWorker = NetworkWorker()
+    self.networkWorker = NetworkWorker(self.config)
     self.networkWorkerThread = QThread()
     self.networkWorker.moveToThread(self.networkWorkerThread)
     self.networkWorker.finished.connect(self.networkWorker.deleteLater)
@@ -219,20 +235,28 @@ class MainWindow(QMainWindow):
     self.networkWorkerThread.finished.connect(self.cleanDisconnection)
     self.networkWorkerThread.finished.connect(self.networkWorkerThread.deleteLater)
     self.networkWorkerThread.start(QThread.NormalPriority)
+    self.networkWorker.updateStatus.connect(lambda s: self.ui.networkStatus.setText(s))
 
-  def endConnection(self):
-    QMetaObject.invokeMethod(self.networkWorker, "end")
-    # self.networkWorkerThread.wait()
+  def endConnection(self, wait):
+    if self.networkWorker:
+      QMetaObject.invokeMethod(self.networkWorker, "end")
+      self.ui.networkStatus.setText("切断中")
+      if wait:
+        self.networkWorkerThread.wait()
 
   def cleanDisconnection(self):
     # self.networkWorkerThread.finished.disconnect()
     self.ui.connectButton.setEnabled(True)
     self.ui.connectButton.setText("接続")
+    self.ui.networkStatus.setText("未接続")
+    self.ui.enableSettings.setEnabled(True)
+    for w in self.networkWidgets:
+      w.setEnabled(True)
     self.networkWorker = None
     self.networkWorkerThread = None
 
   def updateCaptureWorkerRunning(self):
-    running = self.config.enableSettings
+    running = self.ui.enableSettings.isChecked()
     if self.captureWorker and not running:
       self.stopCaptureWorker()
     elif not self.captureWorker and running:
@@ -257,7 +281,6 @@ class MainWindow(QMainWindow):
 
     self.captureWorker = CaptureWorker(self)
     self.captureWorker.done.connect(self.updateCapture)
-    self.captureWorker.done.connect(self.networkWorker.accumulate)
     self.captureWorker.start(QThread.HighPriority)
 
   def stopCaptureWorker(self):
@@ -265,7 +288,7 @@ class MainWindow(QMainWindow):
       self.captureWorker.exiting = True
       self.captureWorker.wait()
       self.captureWorker = None
-    self.ui.status.setText("Capture stopped")
+    QTimer.singleShot(0, lambda: self.ui.status.setText("Capture stopped"))
 
   def updateCapture(self, result):
     if result["success"]:
@@ -302,6 +325,7 @@ class MainWindow(QMainWindow):
       self.ui.status.setText("Capture failed")
 
   def closeEvent(self, event):
+    self.endConnection(True)
     self.stopCaptureWorker()
     self.config.save()
 

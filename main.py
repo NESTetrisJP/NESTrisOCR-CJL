@@ -19,7 +19,7 @@ class MainWindow(QMainWindow):
     self.setFixedSize(880, 650)
     self.ui = Ui_MainWindow()
     self.ui.setupUi(self)
-    self.setWindowTitle("NESTrisOCR for CTWC Japan Lite v0.9.0")
+    self.setWindowTitle("NESTrisOCR for CTWC Japan Lite v0.9.1")
 
     self.settingsWidgets = [
       self.ui.captureWindowName,

@@ -4,7 +4,10 @@ import json
 import time
 import numpy as np # TODO
 
-PACKET_VERSION = 0
+PACKET_VERSION = 1
+
+def encode(data):
+  return (json.dumps(data) + "\n").encode("utf-8")
 
 class NetworkWorker(QObject):
   updateStatus = pyqtSignal(str)
@@ -36,7 +39,7 @@ class NetworkWorker(QObject):
     self.socket.connectToHost(host, int(port), QIODevice.ReadWrite)
     if self.socket.waitForConnected(5000):
       self.updateStatus.emit("ログイン中")
-      self.socket.write(json.dumps({ "userName": self.config.playerName, "key": self.config.accessKey, "version": PACKET_VERSION }).encode("utf-8"))
+      self.socket.write(encode({ "userName": self.config.playerName, "key": self.config.accessKey, "version": PACKET_VERSION }))
       self.updateStatus.emit("接続")
     else:
       self.updateStatus.emit("接続失敗")
@@ -67,10 +70,10 @@ class NetworkWorker(QObject):
 
   def update(self):
     if self.socket:
-      self.socket.write(json.dumps({
+      self.socket.write(encode({
         "timeSent": time.time_ns() // 1000000,
         "data": self.data
-      }).encode("utf-8"))
+      }))
     self.data = []
 
   def accumulate(self, result):

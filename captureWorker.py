@@ -73,6 +73,7 @@ class CaptureWorker(QThread):
         self.capturedFramesForFPS += 1
 
       else:
+        self.scoreReader.reset()
         time.sleep(SLEEP_TIME)
 
 SCORE_TILE_X = 24
@@ -80,6 +81,7 @@ SCORE_TILE_Y = 7
 class ScoreReader:
   def __init__(self):
     self.digitReader = DigitReader()
+    self.enableHexRead = False
 
   def read(self, image):
     result = 0
@@ -88,8 +90,15 @@ class ScoreReader:
       y = SCORE_TILE_Y * 16
       d = self.digitReader.read(image.crop((x, y, x + 14, y + 14)), i == 0, False)
       if d[0][0] == -1: break
+      if i == 0:
+        # Avoid misread '8' to 'B'
+        if d[0][0] == 10: self.enableHexRead = True
+        if (not self.enableHexRead) and d[0][0] == 11: d[0][0] = 8
       result += d[0][0] * (10 ** (5 - i))
     return result
+
+  def reset(self):
+    self.enableHexRead = False
 
 LINES_TILE_X = 19
 LINES_TILE_Y = 2

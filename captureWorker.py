@@ -67,13 +67,12 @@ class CaptureWorker(QThread):
             self.done.emit({ "success": True, "inGame": True, "time": time.time_ns() // 1000000, "field": field, "score": score, "lines": lines, "level": level, "next": next_, "stats": stats, "image": image, "fps": self.showFPS })
           else:
             self.done.emit({ "success": True, "inGame": False, "image": image, "fps": self.showFPS })
-        except:
+        except Exception as e:
           self.done.emit({ "success": False })
         self.capturedFrames += 1
         self.capturedFramesForFPS += 1
 
       else:
-        self.scoreReader.reset()
         time.sleep(SLEEP_TIME)
 
 SCORE_TILE_X = 24
@@ -81,7 +80,7 @@ SCORE_TILE_Y = 7
 class ScoreReader:
   def __init__(self):
     self.digitReader = DigitReader()
-    self.enableHexRead = False
+    self.lastAorB = False
 
   def read(self, image):
     result = 0
@@ -89,16 +88,16 @@ class ScoreReader:
       x = (SCORE_TILE_X + i) * 16
       y = SCORE_TILE_Y * 16
       d = self.digitReader.read(image.crop((x, y, x + 14, y + 14)), i == 0, False)
-      if d[0][0] == -1: break
+      r = d[0][0]
+      if r == -1: break
       if i == 0:
         # Avoid misread '8' to 'B'
-        if d[0][0] == 10: self.enableHexRead = True
-        if (not self.enableHexRead) and d[0][0] == 11: d[0][0] = 8
-      result += d[0][0] * (10 ** (5 - i))
+        if self.lastAorB and r == 8: r = 11
+        if not self.lastAorB and r == 11: r = 8
+        if r == 10 or r == 11: self.lastAorB = True
+        else: self.lastAorB = False
+      result += r * (10 ** (5 - i))
     return result
-
-  def reset(self):
-    self.enableHexRead = False
 
 LINES_TILE_X = 19
 LINES_TILE_Y = 2

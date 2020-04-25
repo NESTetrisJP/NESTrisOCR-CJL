@@ -11,7 +11,7 @@ from captureWorker import CaptureWorker
 from networkWorker import NetworkWorker
 import re
 
-HOSTNAME_REGEX = re.compile("^(([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])\.)*([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])(:[0-9]+)?$", re.IGNORECASE)
+HOSTNAME_REGEX = re.compile("^(([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])\.)*([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])(:[0-9]+)$", re.IGNORECASE)
 
 class MainWindow(QMainWindow):
   def __init__(self):
@@ -19,7 +19,7 @@ class MainWindow(QMainWindow):
     self.setFixedSize(880, 650)
     self.ui = Ui_MainWindow()
     self.ui.setupUi(self)
-    self.setWindowTitle("NESTrisOCR for CTWC Japan Lite v0.9.1")
+    self.setWindowTitle("NESTrisOCR for CTWC Japan Lite v1.0.0")
 
     self.settingsWidgets = [
       self.ui.captureWindowName,

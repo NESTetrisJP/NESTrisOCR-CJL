@@ -4,7 +4,7 @@ import json
 import time
 import numpy as np # TODO
 
-PACKET_VERSION = 1
+PACKET_VERSION = 2
 
 def encode(data):
   return (json.dumps(data) + "\n").encode("utf-8")
@@ -87,4 +87,8 @@ class NetworkWorker(QObject):
         "next": result["next"],
         "lines": result["lines"]
         # "stats":
+      })
+    else:
+      self.data.append({
+        "time": time.time_ns() // 1000000
       })

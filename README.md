@@ -1,6 +1,6 @@
 # NESTrisOCR-CJL
 
-Reimplementation & Simplification & Slight improvements on original NESTrisOCR for [CTWC Japan Lite](https://sites.google.com/view/classic-tetris-japan/).
+Reimplementation & Simplification & Slight improvements on [original NESTrisOCR](https://github.com/alex-ong/NESTrisOCR) for [CTWC Japan Lite](https://sites.google.com/view/classic-tetris-japan/).
 
 See also [NESTrisSystem-CJL](https://github.com/NESTetrisJP/NESTrisSystem-CJL).
 
@@ -28,6 +28,30 @@ Run `python main.py`
 ## Deploying
 
 Run `pyinstaller main.spec`, then `dist/NESTrisOCR/` is distributable.
+
+## What's changed from original version
+
+* All-in-one GUI for connecting/previewing/setting
+* Fixed resolution (512x448) for processing OCR
+* More balanced field detection (reads center 2x2 from 4x4 block)
+* Added game detection feature
+
+## What's missing compared to original version
+
+**Contributions welcome!**
+
+* macOS/Linux support
+* Automatic calibration
+* Different window capture methods (File, OpenCV, etc.)
+* Different packet format
+
+## What I wanted to implement but had no time
+
+**Contributions welcome!**
+
+* Automatic color calibration
+* Faster capturing/OCR
+* Porting to web app (by using `getUserMedia()`, `getDisplayMedia()`)
 
 ## License
 
